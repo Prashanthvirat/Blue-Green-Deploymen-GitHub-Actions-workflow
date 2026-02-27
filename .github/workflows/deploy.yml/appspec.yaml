@@ -1,9 +1,0 @@
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::ECS::Service
-      Properties:
-        TaskDefinition: <TASK_DEFINITION_ARN> # GitHub Actions will replace this
-        LoadBalancerInfo:
-          ContainerName: "strapi-container"
-          ContainerPort: 1337
