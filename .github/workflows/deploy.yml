@@ -1,0 +1,67 @@
+name: Task11 Production Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: task11-prod-repo
+  ECS_TASK_DEFINITION: strapi-prod-task
+  CODEDEPLOY_APP: strapi-prod-app
+  CODEDEPLOY_GROUP: strapi-prod-group
+  AWS_ACCOUNT_ID: 811738710312
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker Image
+        id: build-image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+          
+          echo "Building image..."
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          
+          echo "Tagging image..."
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
+          
+          echo "Pushing image to ECR..."
+          docker push $IMAGE_URI
+          
+          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Render new task definition with new image ID
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: strapi-container
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to Amazon ECS via CodeDeploy
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: strapi-prod-service
+          cluster: strapi-prod-cluster
+          codedeploy-appspec: appspec.yaml
+          codedeploy-application: ${{ env.CODEDEPLOY_APP }}
+          codedeploy-deployment-group: ${{ env.CODEDEPLOY_GROUP }}
