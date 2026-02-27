@@ -14,21 +14,8 @@ Deployment: Blue/Green strategy managed by AWS CodeDeploy for zero-downtime upda
 
 Storage & Registry: Amazon ECR for Docker images and S3/RDS for application state.
 
-📂 Repository Structure
-Plaintext
-├── .github/workflows/deploy.yml  # GitHub Actions pipeline for build and deploy
-├── terraform/                    # Infrastructure as Code (Terraform)
-│   ├── main.tf                   # Provider setup and Role ARNs (Locals)
-│   ├── ecs.tf                    # ECS Cluster, Service, and Task Definitions
-│   ├── CodeDeploy.tf             # Blue/Green deployment group settings
-│   └── rds.tf                    # PostgreSQL Database configuration
-├── appspec.yaml                  # Instructions for CodeDeploy traffic shifting
-├── task-definition.json          # Template for ECS Task revisions
-├── Dockerfile                    # Multi-stage production build for Strapi
-└── .gitignore                    # Prevents provider binaries from being uploaded
-🚀 Getting Started
-1. Prerequisites
-An AWS Account (Account ID: 811738710312).
+<img width="1068" height="545" alt="image" src="https://github.com/user-attachments/assets/6e9bfc37-59e3-4828-848f-1d8d5d9f3cc8" />
+
 
 Existing IAM Roles: ecsTaskExecutionRole, ecs_fargate_taskRole, and CodeDeployECSRole.
 
