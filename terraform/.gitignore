@@ -1,0 +1,32 @@
+# Local .terraform folder (contains massive binaries)
+.terraform/
+terraform/.terraform/
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Provider binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+
+# Node.js / Strapi
+node_modules/
+npm-debug.log
+.env
+.cache/
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db

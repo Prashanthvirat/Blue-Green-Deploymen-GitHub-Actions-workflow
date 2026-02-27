@@ -1,0 +1,52 @@
+# 1. Load Balancer Security Group
+resource "aws_security_group" "alb" {
+  name        = "strapi-alb-sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 2. ECS Task Security Group
+resource "aws_security_group" "ecs_sg" {
+  name        = "strapi-ecs-sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 1337
+    to_port         = 1337
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id] # Only allow traffic from ALB
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 3. RDS Database Security Group
+resource "aws_security_group" "rds_sg" {
+  name        = "strapi-rds-sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_sg.id] # Only allow traffic from ECS
+  }
+}

@@ -1,0 +1,33 @@
+{
+    "family": "strapi-prod-task",
+    "networkMode": "awsvpc",
+    "executionRoleArn": "arn:aws:iam::811738710312:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::811738710312:role/ecs_fargate_taskRole",
+    "containerDefinitions": [
+        {
+            "name": "strapi-container",
+            "image": "811738710312.dkr.ecr.us-east-1.amazonaws.com/task11-prod-repo:latest",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 1337,
+                    "hostPort": 1337,
+                    "protocol": "tcp"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/strapi-prod",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "1024"
+}
